@@ -4,24 +4,23 @@ using namespace ofxCv;
 using namespace cv;
 
 void ofApp::setup() {
-    ofBackground(255,255,255);
-    ofSetVerticalSync(true);
-    //video.load("movies/fingers.mov");
-    //video.setLoopState(OF_LOOP_NORMAL);
-    //video.play();
-	video.setup(1024, 768);
-    face.setup();
+	ofSetVerticalSync(true);
+	finder.setup("haarcascade_frontalface_default.xml");
+	finder.setPreset(ObjectFinder::Fast);
+	video.load("movies/171124_C1_HD_002.mp4");
+	video.play();
+	//video.setup(640, 480);
 }
 
 void ofApp::update() {
     video.update();
-    if(video.isFrameNew()) {
-        face.update(video);
-    }
+	if (video.isFrameNew()) {
+		finder.update(video);
+	}
 }
 
 void ofApp::draw() {
-    ofSetColor(255);
-    video.draw(0, 0);
-    face.draw();
+	video.draw(0, 0);
+	finder.draw();
+	ofDrawBitmapStringHighlight(ofToString(finder.size()), 10, 20);
 }
