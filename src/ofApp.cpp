@@ -10,27 +10,12 @@ void ofApp::setup() {
 	video.load("movies/171124_C1_HD_002.mp4");
 	video.play();
 	video.setPaused(true);
-    
-	/*
-	for (int i = 0; i < video.getTotalNumFrames(); i++) {
-		video.nextFrame();
-		video.update();
-		finder.update(video);
-	}
-	/**/
 }
 
 void ofApp::update() {
-}
-
-void ofApp::keyPressed(int key) {
-	switch (key) {
-	case 'f':
-		video.nextFrame();
-		video.update();
-		finder.update(video);
-		break;
-	}
+	video.nextFrame();
+	video.update();
+	finder.update(video);
 }
 
 void ofApp::draw() {
