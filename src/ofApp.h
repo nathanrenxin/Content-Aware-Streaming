@@ -13,4 +13,6 @@ public:
     ofVideoPlayer video;
 	//ofVideoGrabber video;
 	ofxCv::ObjectFinder finder;
+	int startTime;
+	int stopTime;
 };
