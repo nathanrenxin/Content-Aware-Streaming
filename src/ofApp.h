@@ -3,7 +3,6 @@
 #include "ofMain.h"
 #include "ofxCv.h"
 
-
 class ofApp : public ofBaseApp {
 public:
     void setup();
@@ -13,4 +12,6 @@ public:
     ofVideoPlayer video;
 	//ofVideoGrabber video;
 	ofxCv::ObjectFinder finder;
+
+	cv::CascadeClassifier cascade;
 };
