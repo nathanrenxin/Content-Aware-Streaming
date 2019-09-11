@@ -13,4 +13,11 @@ public:
     ofVideoPlayer video;
 	//ofVideoGrabber video;
 	ofxCv::ObjectFinder finder;
+
+	ofTexture texture;
+	int scaleX, scaleY;
+	int w, h;
+
+	bool lowerResolution = true;
+	int bytes_per_pixel;
 };
