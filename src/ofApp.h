@@ -15,6 +15,7 @@ public:
 	ofxCv::ObjectFinder finder;
 	int startTime;
 	int stopTime;
-	ofImage img1;
-	ofImage img2;
+	ofImage resizedImg;
+	ofImage originalImg;
+	ofImage facesImg;
 };

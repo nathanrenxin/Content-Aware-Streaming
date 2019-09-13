@@ -22,11 +22,19 @@ void ofApp::update() {
 	finder.update(video);
 	ofLog(OF_LOG_NOTICE, "face detection fps is " + ofToString(1000/ofGetElapsedTimeMillis())+"\r\n");
 
-	img1.setFromPixels(video.getPixels());
-	img2.setFromPixels(video.getPixels());
-	img1.resize(img2.getWidth()/10, img2.getHeight() / 10);
-	img1.resize(img2.getWidth(), img2.getHeight());
-
+	resizedImg.setFromPixels(video.getPixels());
+	originalImg.setFromPixels(video.getPixels());
+	facesImg.clear();
+	facesImg.allocate(originalImg.getWidth(), originalImg.getHeight(), OF_IMAGE_COLOR);
+	resizedImg.resize(originalImg.getWidth()/10, originalImg.getHeight() / 10);
+	resizedImg.resize(originalImg.getWidth(), originalImg.getHeight());
+	ofPixels crop;
+	for (int i = 0; i < finder.size(); i++) {
+		ofRectangle object = finder.getObject(i);
+		originalImg.getPixels().cropTo(crop, object.x, object.y, object.width, object.height);
+		crop.pasteInto(facesImg.getPixels(), object.x, object.y);
+	}
+	facesImg.update();
 
 	if (video.getCurrentFrame() == video.getTotalNumFrames()) {
 		stopTime = ofGetSystemTimeMillis();
@@ -36,13 +44,20 @@ void ofApp::update() {
 }
 
 void ofApp::draw() {
-	//video.draw(0, 0);
-	//finder.draw();
-	img1.draw(0, 0);
+	/* Show face detection
+	video.draw(0, 0);
+	finder.draw();
+	*/
+
+	/* Show clear faces over blurry background
+	resizedImg.draw(0, 0);
 	for (int i = 0; i < finder.size(); i++) {
 		ofRectangle object = finder.getObject(i);
-		img2.drawSubsection(object.x, object.y, object.width, object.height, object.x, object.y);
+		originalImg.drawSubsection(object.x, object.y, object.width, object.height, object.x, object.y);
 	}
+	*/
+
+	facesImg.draw(0, 0); //show only faces
 	ofDrawBitmapStringHighlight(ofToString(finder.size()), 10, 20);
 	ofDrawBitmapStringHighlight(ofToString(video.getTotalNumFrames()), 30, 20);
 	ofDrawBitmapStringHighlight(ofToString(video.getCurrentFrame()), 60, 20);
