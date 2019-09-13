@@ -24,8 +24,8 @@ void ofApp::update() {
 
 	img1.setFromPixels(video.getPixels());
 	img2.setFromPixels(video.getPixels());
-	img1.resize(192, 108);
-	img1.resize(1920, 1080);
+	img1.resize(img2.getWidth()/10, img2.getHeight() / 10);
+	img1.resize(img2.getWidth(), img2.getHeight());
 
 
 	if (video.getCurrentFrame() == video.getTotalNumFrames()) {
