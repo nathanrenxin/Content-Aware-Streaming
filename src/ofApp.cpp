@@ -11,6 +11,7 @@ void ofApp::setup() {
 	video.load("movies/output_1080.mp4");
 	video.play();
 	video.setPaused(true);
+	firstFrame = true;
 	startTime = ofGetSystemTimeMillis();
 
 	//ofSetFrameRate(60);
@@ -55,7 +56,14 @@ void ofApp::exit() {
 }
 
 void ofApp::update() {
-	video.nextFrame();
+	if (firstFrame) {
+		video.firstFrame();
+		firstFrame = false;
+	}
+	else {
+		video.nextFrame();
+	}
+	//ofSleepMillis(500);
 	video.update();
 	ofResetElapsedTimeCounter();
 	finder.update(video);
@@ -63,10 +71,17 @@ void ofApp::update() {
 
 	resizedImg.setFromPixels(video.getPixels());
 	originalImg.setFromPixels(video.getPixels());
-	facesImg.clear();
-	facesImg.allocate(originalImg.getWidth(), originalImg.getHeight(), OF_IMAGE_COLOR);
 	resizedImg.resize(originalImg.getWidth()/10, originalImg.getHeight() / 10);
 	resizedImg.resize(originalImg.getWidth(), originalImg.getHeight());
+
+	ofResetElapsedTimeCounter();
+	facesImg.clear();
+	facesImg.allocate(originalImg.getWidth(), originalImg.getHeight(), OF_IMAGE_COLOR);
+	/* Set background transparent in the face frames
+	facesImg.allocate(originalImg.getWidth(), originalImg.getHeight(), OF_IMAGE_COLOR_ALPHA);
+	originalImg.setImageType(OF_IMAGE_COLOR_ALPHA);
+	facesImg.setColor(ofColor(255, 0, 0, 0));
+	*/
 	ofPixels crop;
 	for (int i = 0; i < finder.size(); i++) {
 		ofRectangle object = finder.getObject(i);
@@ -79,6 +94,8 @@ void ofApp::update() {
 	if (!success) {
 		ofLog(OF_LOG_NOTICE, "This frame was not added!");
 	}
+	ofLog(OF_LOG_NOTICE, "face frame generating fps is " + ofToString(1000 / ofGetElapsedTimeMillis()) + "\r\n");
+	facesImg.save("imgs/facesImg"+ to_string(video.getCurrentFrame())+".jpg");
 
 	if (video.getCurrentFrame() == video.getTotalNumFrames()-1) {
 		stopTime = ofGetSystemTimeMillis();
@@ -103,9 +120,8 @@ void ofApp::draw() {
 	for (int i = 0; i < finder.size(); i++) {
 		ofRectangle object = finder.getObject(i);
 		originalImg.drawSubsection(object.x, object.y, object.width, object.height, object.x, object.y);
-	}*/
-	
-
+	}
+	*/
 	facesImg.draw(0, 0); //show only faces
 	ofDrawBitmapStringHighlight(ofToString(finder.size()), 10, 20);
 	ofDrawBitmapStringHighlight(ofToString(video.getTotalNumFrames()), 30, 20);
