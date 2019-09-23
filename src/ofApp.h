@@ -18,4 +18,5 @@ public:
 	ofImage resizedImg;
 	ofImage originalImg;
 	ofImage facesImg;
+	bool firstFrame;
 };
