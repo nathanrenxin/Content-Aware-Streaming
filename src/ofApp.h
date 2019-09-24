@@ -16,7 +16,7 @@ public:
 
 
     ofVideoPlayer video;
-	//
+
 	ofxVideoRecorder    vidRecorder;
 	ofSoundStream       soundStream;
 	bool bRecording;
@@ -27,7 +27,7 @@ public:
 
 	ofFbo recordFbo;
 	ofPixels recordPixels;
-	//
+
 
 	ofxCv::ObjectFinder finder;
 	int startTime;
@@ -36,4 +36,5 @@ public:
 	ofImage originalImg;
 	ofImage facesImg;
 	bool firstFrame;
+	string currentTime;
 };

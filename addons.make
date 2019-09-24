@@ -1,5 +1,4 @@
 ofxCv
-ofxFaceTracker
 ofxGui
 ofxOpenCv
 ofxPoco

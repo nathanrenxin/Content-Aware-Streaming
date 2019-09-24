@@ -5,7 +5,8 @@ using namespace cv;
 
 void ofApp::setup() {
 	ofSetVerticalSync(true);
-	ofLogToFile("myLogFile_" + ofGetTimestampString() + ".txt", true);
+	currentTime = ofGetTimestampString();
+	ofLogToFile("myLogFile_" + currentTime + ".txt", true);
 	finder.setup("haarcascade_frontalface_default.xml");
 	finder.setPreset(ObjectFinder::Fast);
 	video.load("movies/output_1080.mp4");
@@ -14,9 +15,9 @@ void ofApp::setup() {
 	firstFrame = true;
 	startTime = ofGetSystemTimeMillis();
 
-	//ofSetFrameRate(60);
-	//ofSetLogLevel(OF_LOG_VERBOSE);
+	ofSetLogLevel(OF_LOG_FATAL_ERROR);
 
+	/* Setup for the recorder
 #ifdef TARGET_WIN32
 	//vidRecorder.setFfmpegLocation("C:\ffmpeg\bin"); // use this is you have ffmpeg installed in your data folder
 #endif
@@ -28,8 +29,6 @@ void ofApp::setup() {
 	
 	vidRecorder.setVideoCodec("h264");
 	//vidRecorder.setVideoBitrate("12262k");
-	//vidRecorder.setVideoBitrate(video..getStats().estimatedBandwidth);
-	
 	//vidRecorder.setAudioCodec("mp3");
 	//vidRecorder.setAudioBitrate("192k");
 	//soundStream.listDevices();
@@ -42,14 +41,13 @@ void ofApp::setup() {
 
 	//sampleRate = 44100;
 	//channels = 2;
-
 	//vidRecorder.setup(fileName + ofGetTimestampString() + fileExt, video.getWidth(), video.getHeight(), 30, 0, channels);
 	//vidRecorder.setup(fileName+ofGetTimestampString()+fileExt, vidGrabber.getWidth(), vidGrabber.getHeight(), 30); // no audio
 	//vidRecorder.setup(fileName+ofGetTimestampString()+fileExt, 0,0,0, sampleRate, channels); // no video
 	//vidRecorder.setupCustomOutput(video.getWidth(), video.getHeight(), 30, 25, channels, "-vcodec mpeg4 udp://localhost:1234"); // for custom ffmpeg output string (streaming, etc)
 	vidRecorder.setup(fileName + ofGetTimestampString() + fileExt, video.getWidth(), video.getHeight(), 25, sampleRate, channels);
-
 	vidRecorder.start();
+	*/
 }
 void ofApp::exit() {
 	vidRecorder.close();
@@ -67,7 +65,7 @@ void ofApp::update() {
 	video.update();
 	ofResetElapsedTimeCounter();
 	finder.update(video);
-	ofLog(OF_LOG_NOTICE, ofToString(1000/ofGetElapsedTimeMillis()));
+	ofLog(OF_LOG_NOTICE, "face detection fps is " + ofToString(1000/ofGetElapsedTimeMillis()) + "\r\n");
 
 	resizedImg.setFromPixels(video.getPixels());
 	originalImg.setFromPixels(video.getPixels());
@@ -87,15 +85,20 @@ void ofApp::update() {
 		ofRectangle object = finder.getObject(i);
 		originalImg.getPixels().cropTo(crop, object.x, object.y, object.width, object.height);
 		crop.pasteInto(facesImg.getPixels(), object.x, object.y);
+		ofLog(OF_LOG_FATAL_ERROR, ofToString(video.getCurrentFrame())+","+ofToString(object.x)+"," + ofToString(object.y) + "," + ofToString(object.width) + "," + ofToString(object.height)+ "\r\n");
 	}
+	ofLog(OF_LOG_NOTICE, "face frame generating fps is " + ofToString(1000 / ofGetElapsedTimeMillis()) + "\r\n");
 	ofSleepMillis(500);
 	facesImg.update();
+
+	/* Add images to the recorder
 	bool success = vidRecorder.addFrame( facesImg );
 	if (!success) {
 		ofLog(OF_LOG_NOTICE, "This frame was not added!");
 	}
-	ofLog(OF_LOG_NOTICE, "face frame generating fps is " + ofToString(1000 / ofGetElapsedTimeMillis()) + "\r\n");
-	facesImg.save("imgs/facesImg"+ to_string(video.getCurrentFrame())+".jpg");
+	*/
+
+	facesImg.save("imgs_"+ currentTime+"/facesImg"+ to_string(video.getCurrentFrame())+".jpg");
 
 	if (video.getCurrentFrame() == video.getTotalNumFrames()-1) {
 		stopTime = ofGetSystemTimeMillis();
