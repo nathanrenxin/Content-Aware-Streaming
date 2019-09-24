@@ -51,14 +51,17 @@ void ofApp::setup() {
 
 	firstFrame = true;
 
-	ofSetLogLevel(OF_LOG_FATAL_ERROR);
 
+	currentFrame = 1;
 }
+
 void ofApp::exit() {
 
 }
 
 void ofApp::update() {
+
+	ofResetElapsedTimeCounter();
 	if (firstFrame) {
 		faceVideo.firstFrame();
 		backgroundVideo.firstFrame();
@@ -81,6 +84,19 @@ void ofApp::update() {
 	facesImg.setFromPixels(faceVideo.getPixels());
 	backgroundImg.resize(facesImg.getWidth(), facesImg.getHeight());
 
+	/* Using images
+	backgroundImg.load("movies/background/background" + ofToString(currentFrame) + ".jpg");
+	facesImg.load("movies/face/face" + ofToString(currentFrame) + ".jpg");
+	ofResetElapsedTimeCounter();
+	backgroundImg.resize(facesImg.getWidth(), facesImg.getHeight());
+	if (currentFrame == 248) {
+		OF_EXIT_APP(0);
+	}
+	currentFrame += 1;
+	ofLog(OF_LOG_NOTICE, "client fps is " + ofToString(1000 / ofGetElapsedTimeMillis()) + "\r\n");
+	*/
+
+	ofLog(OF_LOG_NOTICE, "client fps is " + ofToString(1000 / (ofGetElapsedTimeMillis() - 500)) + "\r\n");
 	if (backgroundVideo.getCurrentFrame() == backgroundVideo.getTotalNumFrames()-1) {
 		OF_EXIT_APP(0);
 	}

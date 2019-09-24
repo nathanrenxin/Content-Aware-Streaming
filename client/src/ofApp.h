@@ -21,4 +21,6 @@ public:
 	string currentTime;
 	vector < ofRectangle > objects;
 	map<int, vector < ofRectangle >> faceLocations;
+	int currentFrame;
+	map<int, vector < ofImage >> images;
 };
