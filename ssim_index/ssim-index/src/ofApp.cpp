@@ -113,7 +113,17 @@ void ofApp::parseLogFile(std::vector<std::string>& lines)
 		}
 	}
 }
-
+/*
+ * The equivalent of Zhou Wang's SSIM matlab code using OpenCV.
+ * from http://www.cns.nyu.edu/~zwang/files/research/ssim/index.html
+ * The measure is described in :
+ * "Image quality assessment: From error measurement to structural similarity"
+ * C++ code by Rabah Mehdi. http://mehdi.rabah.free.fr/SSIM
+ *
+ * This implementation is under the public domain.
+ * @see http://creativecommons.org/licenses/publicdomain/
+ * The original work may be under copyrights.
+ */
 int ofApp::runSSIM(int frame, ofImage &src, ofImage &face) {
 	// default settings
 	double C1 = 6.5025, C2 = 58.5225;
