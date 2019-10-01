@@ -91,20 +91,20 @@ void ofApp::update() {
 	ofSleepMillis(500);
 	facesImg.update();
 
-	/* Add images to the recorder
+	/* Add images to the recorder*/
 	bool success = vidRecorder.addFrame( facesImg );
 	if (!success) {
 		ofLog(OF_LOG_NOTICE, "This frame was not added!");
 	}
-	*/
+	
 
-	facesImg.save("imgs_"+ currentTime+"/facesImg"+ to_string(video.getCurrentFrame())+".jpg");
+	/*facesImg.save("imgs_"+ currentTime+"/facesImg"+ to_string(video.getCurrentFrame())+".jpg");
 
 	if (video.getCurrentFrame() == video.getTotalNumFrames()-1) {
 		stopTime = ofGetSystemTimeMillis();
 		ofLog(OF_LOG_NOTICE, "video streaming time " + ofToString(stopTime-startTime) + "\r\n");
 		OF_EXIT_APP(0);
-	}
+	}*/
 }
 
 void ofApp::audioIn(float* input, int bufferSize, int nChannels) {

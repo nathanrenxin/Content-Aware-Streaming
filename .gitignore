@@ -1,4 +1,7 @@
 .vs
 bin
 obj
-*.vcxproj
+*.vcxproj*
+*.sln
+*.filter
+*.user
