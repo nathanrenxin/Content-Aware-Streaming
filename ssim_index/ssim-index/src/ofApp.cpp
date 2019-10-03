@@ -5,16 +5,16 @@ void ofApp::setup() {
 	ofSetVerticalSync(true);
 	ofLogToFile("ssim_log" + ofGetTimestampString() + ".txt", true);
 	
-	auto lines = ofSplitString(ofBufferFromFile("myLogFile_2019-09-24-12-52-42-680.txt").getText(), "\r\n");
+	auto lines = ofSplitString(ofBufferFromFile("myLogFile_2019-10-03-11-38-05-398.txt").getText(), "\r\n");
 	parseLogFile(lines);
 
-	faceVideo.load("movies/face.mp4");
-	faceVideo.play();
-	faceVideo.setPaused(true);
-
-	comparisonVideo.load("movies/output_480.mp4");
+	comparisonVideo.load("movies/face.mp4");
 	comparisonVideo.play();
 	comparisonVideo.setPaused(true);
+
+	originalVideo.load("movies/output_1080.mp4");
+	originalVideo.play();
+	originalVideo.setPaused(true);
 
 	firstFrame = true;
 	currentFrame = 1;
@@ -28,41 +28,41 @@ void ofApp::update() {
 	
 	ofResetElapsedTimeCounter();
 	if (firstFrame) {
-		faceVideo.firstFrame();
 		comparisonVideo.firstFrame();
+		originalVideo.firstFrame();
 		firstFrame = false;
 	}
 	else {
-		faceVideo.nextFrame();
 		comparisonVideo.nextFrame();
+		originalVideo.nextFrame();
 	}
-	//ofSleepMillis(500);
-	faceVideo.update();
+	ofSleepMillis(500);
 	comparisonVideo.update();
+	originalVideo.update();
 
-	map<int, vector < ofRectangle >>::iterator it = faceLocations.find(comparisonVideo.getCurrentFrame());
+	map<int, vector < ofRectangle >>::iterator it = faceLocations.find(originalVideo.getCurrentFrame());
 	if (it != faceLocations.end()) {
 		objects = it->second;
 	}
 
-	backgroundImg = comparisonVideo.getPixels();
-	facesImg = faceVideo.getPixels();
-	backgroundImg.resize(facesImg.getWidth(), facesImg.getHeight());
-	runSSIM(currentFrame, backgroundImg, facesImg);
-	/* Using images
-	backgroundImg.load("movies/background/background" + ofToString(currentFrame) + ".jpg");
-	facesImg.load("movies/face/face" + ofToString(currentFrame) + ".jpg");
-	ofResetElapsedTimeCounter();
-	backgroundImg.resize(facesImg.getWidth(), facesImg.getHeight());
-	if (currentFrame == 248) {
-		OF_EXIT_APP(0);
+	originalImg = originalVideo.getPixels();
+	comparisonImg = comparisonVideo.getPixels();
+	comparisonImg.resize(originalImg.getWidth(), originalImg.getHeight());
+
+	for(ofRectangle pos : objects) {
+
+		originalCrop.cropFrom(originalImg, pos.x, pos.y, pos.width, pos.height);
+		comparisonCrop.cropFrom(comparisonImg, pos.x, pos.y, pos.width, pos.height);
+		runSSIM(currentFrame, originalCrop, comparisonCrop);
+
+		//for debugging draw()
+		originalCrop.update();
+		comparisonCrop.update();
 	}
+
 	currentFrame += 1;
-	ofLog(OF_LOG_NOTICE, "client fps is " + ofToString(1000 / ofGetElapsedTimeMillis()) + "\r\n");
-	*/
-	currentFrame += 1;
-	ofLog(OF_LOG_NOTICE, "client fps is " + ofToString(1000 / (ofGetElapsedTimeMillis() - 500)) + "\r\n");
-	if (comparisonVideo.getCurrentFrame() == comparisonVideo.getTotalNumFrames()-1) {
+	//ofLog(OF_LOG_NOTICE, "client fps is " + ofToString(1000 / (ofGetElapsedTimeMillis() - 500)) + "\r\n");
+	if (originalVideo.getCurrentFrame() == originalVideo.getTotalNumFrames()-1) {
 		OF_EXIT_APP(0);
 	}
 }
@@ -74,9 +74,14 @@ void ofApp::draw() {
 		ofRectangle object = objects[i];
 		facesImg.drawSubsection(object.x, object.y, object.width, object.height, object.x, object.y);
 	}*/
+
+	//For debugging SSIM frame comparison:
+	originalCrop.draw(0,0);
+	comparisonCrop.draw(originalCrop.getWidth(), 0);
+
 	ofDrawBitmapStringHighlight(ofToString(objects.size()), 10, 20);
-	ofDrawBitmapStringHighlight(ofToString(comparisonVideo.getTotalNumFrames()), 30, 20);
-	ofDrawBitmapStringHighlight(ofToString(comparisonVideo.getCurrentFrame()), 60, 20);
+	ofDrawBitmapStringHighlight(ofToString(originalVideo.getTotalNumFrames()), 30, 20);
+	ofDrawBitmapStringHighlight(ofToString(originalVideo.getCurrentFrame()), 60, 20);
 }
 
 void ofApp::parseLogFile(std::vector<std::string>& lines)
@@ -124,7 +129,7 @@ void ofApp::parseLogFile(std::vector<std::string>& lines)
  * @see http://creativecommons.org/licenses/publicdomain/
  * The original work may be under copyrights.
  */
-int ofApp::runSSIM(int frame, ofImage &src, ofImage &face) {
+int ofApp::runSSIM(int frame, ofImage src, ofImage face) {
 	// default settings
 	double C1 = 6.5025, C2 = 58.5225;
 
@@ -238,11 +243,12 @@ int ofApp::runSSIM(int frame, ofImage &src, ofImage &face) {
 	// through observation, there is approximately 
 	// 1% error max with the original matlab program
 
-	ofLog(OF_LOG_NOTICE, "frame: " + ofToString(frame) + "\r\n");
-	ofLog(OF_LOG_NOTICE, "(R, G & B SSIM index) \r\n");
-	ofLog(OF_LOG_NOTICE, ofToString(index_scalar.val[2] * 100) + "% \r\n");
-	ofLog(OF_LOG_NOTICE, ofToString(index_scalar.val[1] * 100) + "% \r\n");
-	ofLog(OF_LOG_NOTICE, ofToString(index_scalar.val[0] * 100) + "% \r\n");
+	//ofLog(OF_LOG_NOTICE, "frame: " + ofToString(frame) +"\r\n");
+	//ofLog(OF_LOG_NOTICE, ofToString(index_scalar.val[2] ) );
+	//ofLog(OF_LOG_NOTICE, ofToString(index_scalar.val[1] ) );
+	//ofLog(OF_LOG_NOTICE, ofToString(index_scalar.val[0] ) );
+	ofLog(OF_LOG_NOTICE, ofToString((index_scalar.val[2] + index_scalar.val[1] + index_scalar.val[0]) / 3));
+	ofLog(OF_LOG_NOTICE, ";");
 
 	// if you use this code within a program
 	// don't forget to release the IplImages

@@ -11,11 +11,15 @@ public:
 	void exit();
 
 
-    ofVideoPlayer faceVideo;
-	ofVideoPlayer comparisonVideo;
+    ofVideoPlayer comparisonVideo;
+	ofVideoPlayer originalVideo;
 
-	ofImage backgroundImg;
-	ofImage facesImg;
+	ofImage originalImg;
+	ofImage comparisonImg;
+
+	ofImage originalCrop;
+	ofImage comparisonCrop;
+
 	bool firstFrame;
 	string currentTime;
 	vector < ofRectangle > objects;
@@ -25,5 +29,5 @@ public:
 
 private:
 	void parseLogFile(std::vector<std::string>& lines);
-	int runSSIM(int frame, ofImage& src, ofImage& faces);
+	int runSSIM(int frame, ofImage src, ofImage faces);
 };

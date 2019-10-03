@@ -17,7 +17,7 @@ void ofApp::setup() {
 
 	ofSetLogLevel(OF_LOG_FATAL_ERROR);
 
-	/* Setup for the recorder
+	/* Setup for the recorder */
 #ifdef TARGET_WIN32
 	//vidRecorder.setFfmpegLocation("C:\ffmpeg\bin"); // use this is you have ffmpeg installed in your data folder
 #endif
@@ -28,7 +28,7 @@ void ofApp::setup() {
 	// run 'ffmpeg -codecs' to find out what your implementation supports (or -formats on some older versions)
 	
 	vidRecorder.setVideoCodec("h264");
-	//vidRecorder.setVideoBitrate("12262k");
+	vidRecorder.setVideoBitrate("2756k");
 	//vidRecorder.setAudioCodec("mp3");
 	//vidRecorder.setAudioBitrate("192k");
 	//soundStream.listDevices();
@@ -47,10 +47,9 @@ void ofApp::setup() {
 	//vidRecorder.setupCustomOutput(video.getWidth(), video.getHeight(), 30, 25, channels, "-vcodec mpeg4 udp://localhost:1234"); // for custom ffmpeg output string (streaming, etc)
 	vidRecorder.setup(fileName + ofGetTimestampString() + fileExt, video.getWidth(), video.getHeight(), 25, sampleRate, channels);
 	vidRecorder.start();
-	*/
+	
 }
 void ofApp::exit() {
-	vidRecorder.close();
 }
 
 void ofApp::update() {
@@ -98,13 +97,14 @@ void ofApp::update() {
 	}
 	
 
-	/*facesImg.save("imgs_"+ currentTime+"/facesImg"+ to_string(video.getCurrentFrame())+".jpg");
+	//facesImg.save("imgs_"+ currentTime+"/facesImg"+ to_string(video.getCurrentFrame())+".jpg");
 
 	if (video.getCurrentFrame() == video.getTotalNumFrames()-1) {
 		stopTime = ofGetSystemTimeMillis();
+		vidRecorder.close();
 		ofLog(OF_LOG_NOTICE, "video streaming time " + ofToString(stopTime-startTime) + "\r\n");
 		OF_EXIT_APP(0);
-	}*/
+	}
 }
 
 void ofApp::audioIn(float* input, int bufferSize, int nChannels) {
