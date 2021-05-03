@@ -1,4 +1,3 @@
 ofxCv
 ofxGui
 ofxOpenCv
-ofxTimeMeasurements

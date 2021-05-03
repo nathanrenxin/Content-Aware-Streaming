@@ -37,4 +37,7 @@ public:
 	ofImage facesImg;
 	bool firstFrame;
 	string currentTime;
+
+	int xfactor;
+	bool movingRight;
 };

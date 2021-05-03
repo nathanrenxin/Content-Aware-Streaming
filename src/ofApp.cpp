@@ -15,7 +15,7 @@ void ofApp::setup() {
 	firstFrame = true;
 	startTime = ofGetSystemTimeMillis();
 
-	ofSetLogLevel(OF_LOG_FATAL_ERROR);
+	//ofSetLogLevel(OF_LOG_FATAL_ERROR);
 
 	/* Setup for the recorder
 #ifdef TARGET_WIN32
@@ -48,6 +48,9 @@ void ofApp::setup() {
 	vidRecorder.setup(fileName + ofGetTimestampString() + fileExt, video.getWidth(), video.getHeight(), 25, sampleRate, channels);
 	vidRecorder.start();
 	*/
+
+	xfactor = 0;
+	movingRight = true;
 }
 void ofApp::exit() {
 	vidRecorder.close();
@@ -61,35 +64,75 @@ void ofApp::update() {
 	else {
 		video.nextFrame();
 	}
-	//ofSleepMillis(500);
+	ofSleepMillis(500);
 	video.update();
-	ofResetElapsedTimeCounter();
+	//ofResetElapsedTimeCounter();
 	finder.update(video);
-	ofLog(OF_LOG_NOTICE, "face detection fps is " + ofToString(1000/ofGetElapsedTimeMillis()) + "\r\n");
+	//ofLog(OF_LOG_NOTICE, "face detection fps is " + ofToString(1000/ofGetElapsedTimeMillis()) + "\r\n");
 
+	ofResetElapsedTimeCounter();
 	resizedImg.setFromPixels(video.getPixels());
 	originalImg.setFromPixels(video.getPixels());
 	resizedImg.resize(originalImg.getWidth()/10, originalImg.getHeight() / 10);
 	resizedImg.resize(originalImg.getWidth(), originalImg.getHeight());
 
-	ofResetElapsedTimeCounter();
+	//ofResetElapsedTimeCounter();
 	facesImg.clear();
+	//ofSleepMillis(500);
+	//facesImg.update();
+	//originalImg.update();
 	facesImg.allocate(originalImg.getWidth(), originalImg.getHeight(), OF_IMAGE_COLOR);
+	//ofSleepMillis(500);
+	//facesImg.update();
+
 	/* Set background transparent in the face frames
 	facesImg.allocate(originalImg.getWidth(), originalImg.getHeight(), OF_IMAGE_COLOR_ALPHA);
 	originalImg.setImageType(OF_IMAGE_COLOR_ALPHA);
 	facesImg.setColor(ofColor(255, 0, 0, 0));
 	*/
 	ofPixels crop;
+	//ofImage cropImg;
+	/* Simulate faces
+	ofRectangle object;
+	object.y = 0;
+	object.width = originalImg.getWidth() *0.99;
+	object.height = originalImg.getHeight();
+	if (0 + xfactor * 10 + object.width > originalImg.getWidth()) {
+		movingRight = false;
+	}
+
+	if (xfactor<=1) {
+		movingRight = true;
+	}
+
+	if (movingRight) {
+		object.x = 0 + xfactor * 10;
+		xfactor += 1;
+	} 
+	
+	if(!movingRight){
+		xfactor -= 1;
+		object.x = 0 + xfactor * 10;
+	}
+
+	originalImg.getPixels().cropTo(crop, object.x, object.y, object.width, object.height);
+	crop.pasteInto(facesImg.getPixels(), object.x, object.y);
+	*/
+
 	for (int i = 0; i < finder.size(); i++) {
 		ofRectangle object = finder.getObject(i);
 		originalImg.getPixels().cropTo(crop, object.x, object.y, object.width, object.height);
 		crop.pasteInto(facesImg.getPixels(), object.x, object.y);
-		ofLog(OF_LOG_FATAL_ERROR, ofToString(video.getCurrentFrame())+","+ofToString(object.x)+"," + ofToString(object.y) + "," + ofToString(object.width) + "," + ofToString(object.height)+ "\r\n");
+		//cropImg.cropFrom(originalImg, object.x, object.y, object.width, object.height);
+		//cropImg.getPixels().pasteInto(facesImg.getPixels(), object.x, object.y);
+		//ofLog(OF_LOG_FATAL_ERROR, ofToString(video.getCurrentFrame())+","+ofToString(object.x)+"," + ofToString(object.y) + "," + ofToString(object.width) + "," + ofToString(object.height)+ "\r\n");
 	}
-	ofLog(OF_LOG_NOTICE, "face frame generating fps is " + ofToString(1000 / ofGetElapsedTimeMillis()) + "\r\n");
-	ofSleepMillis(500);
+
+	//ofSleepMillis(500);
 	facesImg.update();
+	//ofLog(OF_LOG_NOTICE, "face frame generating fps is " + ofToString(1000 / (ofGetElapsedTimeMillis()-500)) + "\r\n");
+	facesImg.save("imgs_"+ currentTime+"/facesImg"+ to_string(video.getCurrentFrame())+".jpg");
+	
 
 	/* Add images to the recorder
 	bool success = vidRecorder.addFrame( facesImg );
@@ -98,11 +141,9 @@ void ofApp::update() {
 	}
 	*/
 
-	facesImg.save("imgs_"+ currentTime+"/facesImg"+ to_string(video.getCurrentFrame())+".jpg");
-
 	if (video.getCurrentFrame() == video.getTotalNumFrames()-1) {
 		stopTime = ofGetSystemTimeMillis();
-		ofLog(OF_LOG_NOTICE, "video streaming time " + ofToString(stopTime-startTime) + "\r\n");
+		//ofLog(OF_LOG_NOTICE, "video streaming time " + ofToString(stopTime-startTime) + "\r\n");
 		OF_EXIT_APP(0);
 	}
 }
@@ -119,13 +160,13 @@ void ofApp::draw() {
 	*/
 
 	/* Show clear faces over blurry background*/
-	/*resizedImg.draw(0, 0);
+	resizedImg.draw(0, 0);
 	for (int i = 0; i < finder.size(); i++) {
 		ofRectangle object = finder.getObject(i);
 		originalImg.drawSubsection(object.x, object.y, object.width, object.height, object.x, object.y);
 	}
-	*/
-	facesImg.draw(0, 0); //show only faces
+	
+	//facesImg.draw(0, 0); //show only faces
 	ofDrawBitmapStringHighlight(ofToString(finder.size()), 10, 20);
 	ofDrawBitmapStringHighlight(ofToString(video.getTotalNumFrames()), 30, 20);
 	ofDrawBitmapStringHighlight(ofToString(video.getCurrentFrame()), 60, 20);
